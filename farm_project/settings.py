@@ -1,6 +1,7 @@
 """
 Django settings for farm_project project.
 """
+import os
 from pathlib import Path
 from decouple import config
 import dj_database_url
