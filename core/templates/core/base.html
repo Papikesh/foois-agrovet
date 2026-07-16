@@ -1,0 +1,286 @@
+<!-- core/templates/core/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Onileayo Agrovet{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        earth: {
+                            50: '#f6f7f2', 100: '#e8ebdd', 200: '#cfd6b8', 300: '#adb98a',
+                            400: '#8b9c5f', 500: '#6f8143', 600: '#566633', 700: '#414d29',
+                            800: '#353f24', 900: '#2d3520',
+                        },
+                        clay: {
+                            50: '#faf6f1', 100: '#f0e6d8', 200: '#e0cab0', 300: '#caa87d',
+                            400: '#b38a58', 500: '#9a7245', 600: '#7d5b38', 700: '#63482e',
+                            800: '#523c2a', 900: '#463327',
+                        },
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f6f7f2; }
+        ::-webkit-scrollbar-thumb { background: #6f8143; border-radius: 10px; }
+
+        .glass-nav { backdrop-filter: blur(12px); background: rgba(246, 247, 242, 0.9); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-14px); } }
+        .animate-float { animation: float 5s ease-in-out infinite; }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+            70% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        .whatsapp-pulse { animation: pulse-ring 2s infinite; }
+
+        /* mobile drawer */
+        #mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.35s ease;
+        }
+        #mobile-menu.open { transform: translateX(0); }
+        #menu-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #menu-overlay.open { opacity: 1; pointer-events: auto; }
+
+        .hamburger span { transition: all 0.3s ease; }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-earth-50 text-earth-900 font-body">
+
+    <!-- NAVBAR -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-earth-200">
+        <nav class="max-w-7xl mx-auto px-5 sm:px-6 py-4 flex items-center justify-between">
+            <a href="{% url 'core:home' %}" class="font-display text-xl sm:text-2xl font-bold text-earth-700 tracking-tight">
+                🐔 Onileayo<span class="text-clay-500"> Agrovet</span>
+            </a>
+
+            <ul class="hidden md:flex items-center gap-8 font-medium text-earth-700">
+                <li><a href="{% url 'core:home' %}" class="hover:text-clay-500 transition-colors">Home</a></li>
+                <li><a href="{% url 'products:product_list' %}" class="hover:text-clay-500 transition-colors">Shop</a></li>
+                <li><a href="{% url 'consultation:book' %}" class="hover:text-clay-500 transition-colors">Consultation</a></li>
+                <li>
+                    <a href="{% url 'orders:cart' %}" class="relative hover:text-clay-500 transition-colors">
+                        Cart
+                        <span class="cart-badge {% if cart_count == 0 %}hidden{% endif %} absolute -top-2 -right-4 bg-clay-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ cart_count }}</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="flex items-center gap-3 sm:gap-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'core:my_account' %}" class="hidden sm:inline text-sm text-earth-600 hover:text-clay-500 font-medium">Hi, {{ user.first_name|default:user.username }}</a>
+                    <a href="{% url 'account_logout' %}" class="hidden sm:inline-block px-4 py-2 rounded-full bg-earth-700 text-white text-sm font-semibold hover:bg-earth-800 transition-colors">Logout</a>
+                {% else %}
+                    <a href="{% url 'account_login' %}" class="hidden sm:inline-block px-5 py-2 rounded-full bg-clay-500 text-white text-sm font-semibold hover:bg-clay-600 transition-all hover:scale-105 shadow-md shadow-clay-500/30">Sign in with Google</a>
+                {% endif %}
+
+                <button id="menu-btn" class="hamburger md:hidden flex flex-col justify-center gap-1.5 w-8 h-8">
+                    <span class="block w-6 h-0.5 bg-earth-700 rounded"></span>
+                    <span class="block w-6 h-0.5 bg-earth-700 rounded"></span>
+                    <span class="block w-6 h-0.5 bg-earth-700 rounded"></span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- mobile drawer overlay -->
+    <div id="menu-overlay" class="fixed inset-0 bg-black/40 z-40 md:hidden"></div>
+
+    <!-- mobile slide-in drawer -->
+    <div id="mobile-menu" class="fixed top-0 right-0 bottom-0 w-72 bg-white z-50 md:hidden shadow-2xl px-6 py-6 flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <span class="font-display text-lg font-bold text-earth-700">Menu</span>
+            <button id="close-menu" class="text-2xl text-earth-500">✕</button>
+        </div>
+        <a href="{% url 'core:home' %}" class="py-3 border-b border-earth-100 font-medium text-earth-700">🏠 Home</a>
+        <a href="{% url 'products:product_list' %}" class="py-3 border-b border-earth-100 font-medium text-earth-700">🛒 Shop</a>
+        <a href="{% url 'consultation:book' %}" class="py-3 border-b border-earth-100 font-medium text-earth-700">📅 Consultation</a>
+        <a href="{% url 'orders:cart' %}" class="py-3 border-b border-earth-100 font-medium text-earth-700 flex items-center justify-between">
+            <span>🧺 Cart</span>
+            <span class="cart-badge {% if cart_count == 0 %}hidden{% endif %} bg-clay-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{{ cart_count }}</span>
+        </a>
+
+        <div class="mt-auto">
+            {% if user.is_authenticated %}
+                <a href="{% url 'core:my_account' %}" class="block text-sm text-earth-600 font-semibold mb-3 hover:text-clay-500">👤 My Account</a>
+                <a href="{% url 'account_logout' %}" class="block text-center py-3 rounded-full bg-earth-700 text-white font-semibold">Logout</a>
+            {% else %}
+                <a href="{% url 'account_login' %}" class="block text-center py-3 rounded-full bg-clay-500 text-white font-semibold">Sign in with Google</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if announcements %}
+    <div class="bg-earth-700 text-earth-50 text-sm py-2 overflow-hidden mt-[68px] sm:mt-[72px]">
+        <div class="animate-marquee whitespace-nowrap">
+            {% for a in announcements %}
+                <span class="mx-8">📢 {{ a.text }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <main class="{% if not announcements %}mt-[68px] sm:mt-[72px]{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Floating WhatsApp button -->
+    <a href="https://wa.me/2347067682044" target="_blank"
+       class="whatsapp-pulse fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+        <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39c1.44.79 3.06 1.2 4.71 1.2h.01c5.46 0 9.9-4.45 9.9-9.91C21.91 6.45 17.5 2 12.04 2zm0 18.13c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.13 8.13 0 0 1-1.24-4.36c0-4.51 3.67-8.19 8.2-8.19 2.19 0 4.25.85 5.8 2.41a8.15 8.15 0 0 1 2.4 5.8c0 4.52-3.68 8.2-8.17 8.2zm4.5-6.13c-.25-.12-1.47-.72-1.69-.81-.23-.08-.4-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.25 3.74.59.26 1.06.41 1.42.52.6.19 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.1-.23-.16-.48-.28z"/></svg>
+    </a>
+
+    <footer class="bg-earth-800 text-earth-100 mt-24">
+        <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div>
+                <h3 class="font-display text-xl font-bold mb-3">🐔 Onileayo Agrovet</h3>
+                <p class="text-earth-300 text-sm leading-relaxed">Fresh chicken feeds and expert farm consultation, straight from the source to you.</p>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-3">Quick Links</h4>
+                <ul class="space-y-2 text-sm text-earth-300">
+                    <li><a href="{% url 'products:product_list' %}" class="hover:text-clay-400">Shop Products</a></li>
+                    <li><a href="{% url 'consultation:book' %}" class="hover:text-clay-400">Book Consultation</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-semibold mb-3">Contact</h4>
+                <p class="text-sm text-earth-300">Reach us on WhatsApp for any inquiry — we typically respond within minutes.</p>
+            </div>
+        </div>
+        <div class="border-t border-earth-700 text-center text-xs text-earth-400 py-5">
+            &copy; {% now "Y" %} Onileayo Agrovet. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('menu-overlay');
+        const closeBtn = document.getElementById('close-menu');
+
+        function openMenu() {
+            mobileMenu.classList.add('open');
+            overlay.classList.add('open');
+            menuBtn.classList.add('open');
+        }
+        function closeMenu() {
+            mobileMenu.classList.remove('open');
+            overlay.classList.remove('open');
+            menuBtn.classList.remove('open');
+        }
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
+        });
+        closeBtn.addEventListener('click', closeMenu);
+        overlay.addEventListener('click', closeMenu);
+
+        function updateCartBadges(count) {
+            document.querySelectorAll('.cart-badge').forEach(el => {
+                el.textContent = count;
+                el.classList.toggle('hidden', count === 0);
+            });
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-24 right-6 z-[60] max-w-xs px-6 py-4 rounded-xl shadow-xl text-white font-medium transition-transform duration-300 translate-x-[150%] ${type === 'success' ? 'bg-earth-700' : 'bg-red-500'}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.remove('translate-x-[150%]'));
+            setTimeout(() => {
+                toast.classList.add('translate-x-[150%]');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+
+            // AJAX add-to-cart forms: no page navigation
+            if (form.classList.contains('add-to-cart-form')) {
+                e.preventDefault();
+                const btn = form.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = 'Adding...';
+
+                fetch(form.action, { method: 'POST', body: new FormData(form) })
+                    .then(res => res.json())
+                    .then(data => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        showToast(data.message, data.success ? 'success' : 'error');
+                        if (data.success) updateCartBadges(data.cart_count);
+                    })
+                    .catch(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        showToast('Something went wrong. Please try again.', 'error');
+                    });
+                return;
+            }
+
+            // All other forms: normal submit, just show a spinner
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn && !btn.disabled) {
+                btn.disabled = true;
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+                btn.innerHTML = `<span class="inline-flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    Please wait...
+                </span>`;
+            }
+        });
+
+        document.querySelectorAll('.site-message').forEach(msg => {
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 300);
+            }, 4000);
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

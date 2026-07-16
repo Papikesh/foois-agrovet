@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% block title %}Sign Out — FarmProject{% endblock %}
+
+{% block content %}
+<section class="min-h-[60vh] flex items-center justify-center px-6 py-16">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-10 text-center" data-aos="zoom-in">
+        <p class="text-5xl mb-4">👋</p>
+        <h1 class="font-display text-2xl font-bold text-earth-800 mb-3">Sign out of FarmProject?</h1>
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full py-4 bg-clay-500 text-white rounded-full font-semibold hover:bg-clay-600 transition-all">
+                Yes, Sign Out
+            </button>
+        </form>
+        <a href="{% url 'core:home' %}" class="block mt-4 text-earth-500 hover:text-clay-500 text-sm">Cancel</a>
+    </div>
+</section>
+{% endblock %}

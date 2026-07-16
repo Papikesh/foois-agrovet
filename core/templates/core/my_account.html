@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+{% block title %}My Account — Onileayo Agrovet{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-6 py-16 min-h-[70vh]">
+    <div class="mb-12" data-aos="fade-up">
+        <span class="text-clay-500 font-semibold text-sm uppercase tracking-widest">My Account</span>
+        <h1 class="font-display text-4xl font-bold text-earth-800 mt-2">Hi, {{ user.first_name|default:user.username }} 👋</h1>
+        <p class="text-earth-500 mt-2">Track your orders and consultation bookings here.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-4 mb-8 border-b border-earth-200" data-aos="fade-up">
+        <button onclick="showTab('orders')" id="tab-orders-btn" class="tab-btn px-5 py-3 font-semibold text-earth-800 border-b-2 border-clay-500">
+            🛒 Orders ({{ orders.count }})
+        </button>
+        <button onclick="showTab('consultations')" id="tab-consultations-btn" class="tab-btn px-5 py-3 font-semibold text-earth-400 border-b-2 border-transparent">
+            📅 Consultations ({{ consultations.count }})
+        </button>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="tab-orders" class="space-y-5">
+        {% for order in orders %}
+        <div class="bg-white rounded-2xl shadow-md p-6" data-aos="fade-up">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                    <p class="font-semibold text-earth-800">Order #{{ order.id }}</p>
+                    <p class="text-sm text-earth-500">{{ order.created_at|date:"M d, Y — h:i A" }}</p>
+                </div>
+                <span class="px-4 py-1.5 rounded-full text-xs font-bold
+                    {% if order.status == 'pending' %}bg-yellow-100 text-yellow-700
+                    {% elif order.status == 'confirmed' %}bg-blue-100 text-blue-700
+                    {% elif order.status == 'completed' %}bg-green-100 text-green-700
+                    {% else %}bg-red-100 text-red-700{% endif %}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            <div class="space-y-1 mb-4">
+                {% for item in order.items.all %}
+                <p class="text-sm text-earth-600">{{ item.quantity }} × {{ item.product.name }} — ₦{{ item.subtotal }}</p>
+                {% endfor %}
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-earth-100">
+                <p class="font-bold text-earth-800">Total: ₦{{ order.total_price }}</p>
+                <a href="https://wa.me/2347067682044?text=Hi, I'd like an update on Order #{{ order.id }}" target="_blank" class="text-sm text-clay-500 font-semibold hover:text-clay-600">
+                    Message us →
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-20" data-aos="fade-up">
+            <p class="text-5xl mb-4">📦</p>
+            <p class="text-earth-500 mb-6">You haven't placed any orders yet.</p>
+            <a href="{% url 'products:product_list' %}" class="inline-block px-8 py-3 bg-clay-500 text-white rounded-full font-semibold hover:bg-clay-600 transition-colors">Start Shopping</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- CONSULTATIONS TAB -->
+    <div id="tab-consultations" class="space-y-5 hidden">
+        {% for c in consultations %}
+        <div class="bg-white rounded-2xl shadow-md p-6" data-aos="fade-up">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div>
+                    <p class="font-semibold text-earth-800">{{ c.category|default:"General Consultation" }}</p>
+                    <p class="text-sm text-earth-500">Booked {{ c.created_at|date:"M d, Y" }}</p>
+                </div>
+                <span class="px-4 py-1.5 rounded-full text-xs font-bold
+                    {% if c.status == 'pending' %}bg-yellow-100 text-yellow-700
+                    {% elif c.status == 'confirmed' %}bg-blue-100 text-blue-700
+                    {% elif c.status == 'completed' %}bg-green-100 text-green-700
+                    {% else %}bg-red-100 text-red-700{% endif %}">
+                    {{ c.get_status_display }}
+                </span>
+            </div>
+            <p class="text-sm text-earth-600">📅 {{ c.preferred_date|date:"M d, Y" }} at {{ c.preferred_time|time:"h:i A" }}</p>
+            {% if c.message %}<p class="text-sm text-earth-500 mt-2 italic">"{{ c.message }}"</p>{% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-20" data-aos="fade-up">
+            <p class="text-5xl mb-4">🗓️</p>
+            <p class="text-earth-500 mb-6">You haven't booked any consultations yet.</p>
+            <a href="{% url 'consultation:book' %}" class="inline-block px-8 py-3 bg-clay-500 text-white rounded-full font-semibold hover:bg-clay-600 transition-colors">Book Now</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+    function showTab(tab) {
+        document.getElementById('tab-orders').classList.add('hidden');
+        document.getElementById('tab-consultations').classList.add('hidden');
+        document.getElementById('tab-orders-btn').classList.remove('text-earth-800', 'border-clay-500');
+        document.getElementById('tab-orders-btn').classList.add('text-earth-400', 'border-transparent');
+        document.getElementById('tab-consultations-btn').classList.remove('text-earth-800', 'border-clay-500');
+        document.getElementById('tab-consultations-btn').classList.add('text-earth-400', 'border-transparent');
+
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        document.getElementById('tab-' + tab + '-btn').classList.remove('text-earth-400', 'border-transparent');
+        document.getElementById('tab-' + tab + '-btn').classList.add('text-earth-800', 'border-clay-500');
+    }
+</script>
+{% endblock %}
