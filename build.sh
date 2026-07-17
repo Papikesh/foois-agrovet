@@ -2,6 +2,7 @@
 set -o errexit
 
 pip install -r requirements.txt
+python manage.py findstatic admin/css/base.css --verbosity 2
 python manage.py collectstatic --no-input --clear -v 2
 python manage.py migrate
 
