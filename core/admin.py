@@ -1,6 +1,6 @@
 # core/admin.py
 from django.contrib import admin
-from .models import Banner, Testimonial, Announcement
+from .models import Banner, Testimonial, Announcement, CEOProfile
 
 @admin.register(Banner)
 class BannerAdmin(admin.ModelAdmin):
@@ -25,3 +25,9 @@ class AnnouncementAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     list_editable = ('is_active',)
     ordering = ('-created_at',)
+
+
+@admin.register(CEOProfile)
+class CEOProfileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'title', 'is_active', 'created_at')
+    list_filter = ('is_active',)

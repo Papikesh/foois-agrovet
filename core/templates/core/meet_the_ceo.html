@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+{% block title %}Meet the CEO — Onileayo Agrovet{% endblock %}
+
+{% block content %}
+{% if ceo %}
+<!-- BIG BOLD BANNER -->
+<section class="relative h-[60vh] min-h-[420px] overflow-hidden">
+    <img src="{{ ceo.photo.url }}" alt="{{ ceo.name }}" class="absolute inset-0 w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-t from-earth-900/90 via-earth-900/40 to-transparent"></div>
+    <div class="relative h-full max-w-5xl mx-auto px-6 flex flex-col justify-end pb-16" data-aos="fade-up">
+        <span class="text-clay-300 font-semibold text-sm uppercase tracking-widest mb-3">Meet the Team</span>
+        <h1 class="font-display text-5xl md:text-6xl font-extrabold text-white mb-2">{{ ceo.name }}</h1>
+        <p class="text-earth-100 text-xl">{{ ceo.title }}</p>
+    </div>
+</section>
+
+<!-- FULL STORY -->
+<section class="max-w-3xl mx-auto px-6 py-20">
+    <div class="prose prose-lg max-w-none text-earth-700 leading-relaxed" data-aos="fade-up">
+        {{ ceo.full_bio|linebreaks }}
+    </div>
+
+    <div class="mt-14 text-center" data-aos="fade-up">
+        <a href="{% url 'core:home' %}" class="inline-block px-8 py-3.5 border-2 border-earth-600 text-earth-700 font-semibold rounded-full hover:bg-earth-600 hover:text-white transition-all">
+            ← Back to Home
+        </a>
+    </div>
+</section>
+{% else %}
+<section class="min-h-[60vh] flex items-center justify-center px-6">
+    <p class="text-earth-500 text-lg">Content coming soon — add a CEO profile from Django Admin.</p>
+</section>
+{% endif %}
+{% endblock %}

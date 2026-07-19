@@ -46,3 +46,19 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.text
+
+class CEOProfile(models.Model):
+    """Content for the 'Meet the CEO' section and page"""
+    name = models.CharField(max_length=150)
+    title = models.CharField(max_length=150, help_text="e.g. Founder & CEO")
+    photo = models.ImageField(upload_to='ceo/')
+    short_bio = models.TextField(help_text="Shown on the homepage — keep this brief, 2-3 sentences")
+    full_bio = models.TextField(help_text="Shown on the full 'Meet the CEO' page — can be as long as you like")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
