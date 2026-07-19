@@ -2,10 +2,6 @@
 set -o errexit
 
 pip install -r requirements.txt
-python manage.py collectstatic --noinput
-echo "===== STATICFILES DIRECTORY CONTENTS ====="
-ls -la /opt/render/project/src/staticfiles/ || echo "DIRECTORY DOES NOT EXIST"
-find /opt/render/project/src/staticfiles -type f | wc -l
 python manage.py migrate
 
 python manage.py shell << EOF
