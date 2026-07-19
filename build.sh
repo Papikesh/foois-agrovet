@@ -2,9 +2,10 @@
 set -o errexit
 
 pip install -r requirements.txt
-python manage.py findstatic admin/css/base.css --verbosity 2
-python manage.py shell -c "from django.conf import settings; print('FINDERS:', settings.STATICFILES_FINDERS); print('STATIC_ROOT:', settings.STATIC_ROOT); print('STORAGES:', settings.STORAGES)"
-python manage.py collectstatic --no-input --clear -v 2
+python manage.py collectstatic --noinput
+echo "===== STATICFILES DIRECTORY CONTENTS ====="
+ls -la /opt/render/project/src/staticfiles/ || echo "DIRECTORY DOES NOT EXIST"
+find /opt/render/project/src/staticfiles -type f | wc -l
 python manage.py migrate
 
 python manage.py shell << EOF
