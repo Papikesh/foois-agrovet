@@ -2,6 +2,7 @@
 set -o errexit
 
 pip install -r requirements.txt
+python manage.py shell -c "from django.conf import settings; print('CLOUD_NAME:', repr(settings.CLOUDINARY_STORAGE['CLOUD_NAME'])); print('API_KEY:', repr(settings.CLOUDINARY_STORAGE['API_KEY'])); print('API_SECRET SET:', bool(settings.CLOUDINARY_STORAGE['API_SECRET']))"
 python manage.py migrate
 
 python manage.py shell << EOF
